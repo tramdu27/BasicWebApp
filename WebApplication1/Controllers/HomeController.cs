@@ -36,25 +36,32 @@ namespace WebApplication1.Controllers
         public ActionResult EditingPopup_Create([DataSourceRequest] DataSourceRequest request, Users users)
         {
             var userSvc = new UserSvc();
-
             if (users != null && ModelState.IsValid)
             {
-                try
-                {
-                    userSvc.Create(users);
-                    TempData["SuccessMessage"] = "Tạo người dùng thành công.";
-                }
-                catch (Exception ex)
-                {
-                   
-                    ModelState.AddModelError("", "Lỗi khi tạo người dùng: " + ex.Message);
-                }
+                userSvc.Create(users);
             }
-            return Json(new
-            {
-                Data = new[] { users }.ToDataSourceResult(request, ModelState),
-                
-            }, JsonRequestBehavior.AllowGet);
+
+            return Json(new[] { users }.ToDataSourceResult(request, ModelState), JsonRequestBehavior.AllowGet);
+            //var userSvc = new UserSvc();
+
+            //if (users != null && ModelState.IsValid)
+            //{
+            //    try
+            //    {
+            //        userSvc.Create(users);
+            //        TempData["SuccessMessage"] = "Tạo người dùng thành công.";
+            //    }
+            //    catch (Exception ex)
+            //    {
+
+            //        ModelState.AddModelError("", "Lỗi khi tạo người dùng: " + ex.Message);
+            //    }
+            //}
+            //return Json(new
+            //{
+            //    Data = new[] { users }.ToDataSourceResult(request, ModelState),
+
+            //}, JsonRequestBehavior.AllowGet);
         }
 
         //public ActionResult EditingPopup_Create([DataSourceRequest] DataSourceRequest request, Users users)

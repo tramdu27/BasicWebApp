@@ -105,23 +105,23 @@ namespace WebApplication1.Models
                 {
                     connection.Open();
 
-                    using (SqlCommand command = new SqlCommand("pcd_SaveUser", connection))
+                    using (SqlCommand command = new SqlCommand("pcd_SaveUsers", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@userid", users.UserID);
                         command.Parameters.AddWithValue("@username", users.UserName);
-                        command.Parameters.AddWithValue("@email", users.Email);
                         command.Parameters.AddWithValue("@password", users.Password);
+                        command.Parameters.AddWithValue("@email", users.Email);
                         command.Parameters.AddWithValue("@tel", users.Tel);
                         command.Parameters.AddWithValue("@disabled", users.Disabled);
 
-                        //SqlParameter outputParameter = new SqlParameter("@userid", SqlDbType.VarChar, 50);
-                        //outputParameter.Direction = ParameterDirection.Output;
-                        //command.Parameters.Add(outputParameter);
+                    //SqlParameter outputParameter = new SqlParameter("@userid", SqlDbType.VarChar, 50);
+                    //outputParameter.Direction = ParameterDirection.Output;
+                    //command.Parameters.Add(outputParameter);
 
-                        command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
 
-                        //users.UserID = outputParameter.Value.ToString();
+                    //users.UserID = outputParameter.Value.ToString();
 
                     //}
                 }

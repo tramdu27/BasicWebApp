@@ -9,6 +9,7 @@ namespace WebApplication1.Models
     public class Users
     {
         [Required]
+        [Key]
         [MaxLength(50)]
         private string _id;
         public string UserID
