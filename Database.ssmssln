@@ -1,19 +1,80 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# SQL Server Management Studio Solution File, Format Version 19.00
-VisualStudioVersion = 15.0.28307.421
-MinimumVisualStudioVersion = 10.0.40219.1
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Default|Default = Default|Default
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9C559E25-780E-4045-B8DE-ED98D9AFAD4F}.Default|Default.ActiveCfg = Default
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9142CD9D-0729-47CB-8A20-52C436B407B3}
-	EndGlobalSection
-EndGlobal
+use BasicWeb
+Create procedure pcd_GetUsers
+as
+begin
+select * from Users
+end
+exec pcd_GetUsers
+ create table Users
+ (
+ UserID nvarchar(50),
+ UserName nvarchar(50),
+ Password nvarchar(50), Email nvarchar(50),Tel nvarchar(50),Disabled tinyint
+
+ )
+ drop procedure pcd_SaveUsers
+ drop table Users
+create procedure pcd_SaveUsers
+@userid nvarchar(50),
+@username nvarchar(50),
+@password nvarchar(50),
+@email nvarchar(50),
+@tel nvarchar,
+@disabled tinyint
+as
+begin 
+insert into Users(UserID, UserName,Password, Email,Tel,Disabled) values(@userid,@username, @password,@email, @tel, @disabled)
+end
+
+ALTER TABLE Users
+ADD UserID nvarchar(50);
+
+ALTER TABLE Users
+DROP COLUMN UserID;
+
+
+create procedure pcd_GetUsersById
+@userID nvarchar(50)
+ as 
+ begin
+ select *from Users where UserID = @userID
+ end
+
+
+ drop procedure pcd_UpdateUser
+ select * from Users
+
+ create procedure pcd_UpdateUser
+ @userid nvarchar(50),
+@username nvarchar(50),
+@password nvarchar(50),
+@email nvarchar(50),
+@tel nvarchar(50),
+@disabled tinyint
+as
+begin 
+update Users set 
+UserName = @username,
+Password = @password,
+Email= @email,
+Tel= @tel,
+Disabled = @disabled
+from Users where UserID = @userid
+end
+
+
+create procedure pcd_DeleteUsers
+@userID nvarchar(50)
+as 
+begin
+delete from Users where UserID = @userID
+end
+
+create procedure pcd_CheckID
+@userID nvarchar(50)
+as begin
+SELECT COUNT(*) AS count
+FROM Users
+WHERE UserID = @userID
+end
