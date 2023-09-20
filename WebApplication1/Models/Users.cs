@@ -30,7 +30,7 @@ namespace WebApplication1.Models
 
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid Phone Number")]
         public string Tel { get; set; }
-        public int Disabled { get; set; }
-        public string Searchstring { get; set; }
+        public byte Disabled { get; set; }
+        
     }
 }

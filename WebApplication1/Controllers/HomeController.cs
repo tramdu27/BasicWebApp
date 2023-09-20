@@ -1,30 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using WebApplication1.Models;
+using Kendo.Mvc.Extensions;
+using Kendo.Mvc.UI;
+using System;
 
 namespace WebApplication1.Controllers
 {
-    public class HomeController : Controller
+    public partial class HomeController : Controller
     {
-        public ActionResult Index()
+        //UserSvc svc = new UserSvc() ;
+        public ActionResult Editing_Popup()
         {
             return View();
         }
+    
+        [AcceptVerbs(HttpVerbs.Post)]
 
-        public ActionResult About()
+        public ActionResult EditingPopup_Read([DataSourceRequest] DataSourceRequest request)
         {
-            ViewBag.Message = "Your application description page.";
+            var users = new UserSvc().Read();
 
-            return View();
+
+            var dataSourceResult = users.ToDataSourceResult(request);
+
+            return Json(dataSourceResult, JsonRequestBehavior.AllowGet);
+
+
+           
+
         }
 
-        public ActionResult Contact()
+            [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult EditingPopup_Create([DataSourceRequest] DataSourceRequest request, Users users)
         {
-            ViewBag.Message = "Your contact page.";
+            var userSvc = new UserSvc();
 
-            return View();
+            if (users != null && ModelState.IsValid)
+            {
+                try
+                {
+                    userSvc.Create(users);
+                    TempData["SuccessMessage"] = "Tạo người dùng thành công.";
+                }
+                catch (Exception ex)
+                {
+                   
+                    ModelState.AddModelError("", "Lỗi khi tạo người dùng: " + ex.Message);
+                }
+            }
+            return Json(new
+            {
+                Data = new[] { users }.ToDataSourceResult(request, ModelState),
+                
+            }, JsonRequestBehavior.AllowGet);
         }
+
+        //public ActionResult EditingPopup_Create([DataSourceRequest] DataSourceRequest request, Users users)
+        //{
+        //    var userSvc = new UserSvc();
+        //    if (users != null && ModelState.IsValid)
+        //    {
+        //        userSvc.Create(users);
+        //    }
+
+        //    return Json(new[] { users }.ToDataSourceResult(request, ModelState), JsonRequestBehavior.AllowGet);
+        //}
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult EditingPopup_Update([DataSourceRequest] DataSourceRequest request, Users users)
+        {
+            var userSvc = new UserSvc();
+            if (users != null && ModelState.IsValid)
+            {
+                userSvc.Update(users);
+            }
+
+            return Json(new[] { users }.ToDataSourceResult(request, ModelState), JsonRequestBehavior.AllowGet);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult EditingPopup_Destroy([DataSourceRequest] DataSourceRequest request, Users users)
+        {
+            var userSvc = new UserSvc();
+            if (users != null)
+            {
+                userSvc.Destroy(users);
+            }
+
+            return Json(new[] { users }.ToDataSourceResult(request, ModelState));
+        }
+
     }
 }

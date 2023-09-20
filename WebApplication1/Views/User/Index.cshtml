@@ -1,64 +1,239 @@
-﻿@model IEnumerable<WebApplication1.Models.Users>
+﻿@*@model IEnumerable<WebApplication1.Models.Users>
+
+
+    @{
+        ViewBag.Title = "Index";
+    }
+
+    <h2>Index</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+    </button>
+    <p>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+    </p>
+
+    <table class="table table-striped">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Tel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Disabled)
+            </th>
+            <th>Action</th>
+        </tr>
+
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Password)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Disabled)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.UserID},new { @class = "btn btn-primary" })
+                @Html.ActionLink("Details", "Details", new { id=item.UserID  }, new { @class = "btn btn-info" })
+                @Html.ActionLink("Delete", "Delete", new { id=item.UserID }, new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+
+    </table>
+*@
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Home Page";
 }
+@model IEnumerable<WebApplication1.Models.Users>
+<head>
 
-<h2>Index</h2>
+    @*<script src="~/Content/js/index.js"></script>*@
+    @*<link  href="~/Content/js/index.js"/>*@
 
-<p>
-    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
-</p>
+</head>
+@using Kendo.Mvc.UI
 
-<table class="table table-striped">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.UserID)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.UserName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Password)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Email)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Tel)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Disabled)
-        </th>
-        <th>Action</th>
-    </tr>
+@(Html.Kendo().Grid<WebApplication1.Models.Users>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.UserID);
+        columns.Bound(p => p.UserName).Width(200);
+        columns.Bound(p => p.Password).Width(200);
+        columns.Bound(p => p.Email).Width(200);
+        columns.Bound(p => p.Tel).Width(200);
+        columns.Bound(p => p.Disabled).Width(120);
+        columns.Command(command => { command.Edit(); command.Destroy(); }).Width(200);
+    })
+    .ToolBar(toolbar => toolbar.Create())
+    .Editable(editable => editable.Mode(GridEditMode.PopUp))
+    .Pageable()
+    .Sortable()
+    .Scrollable()
+    .HtmlAttributes(new { style = "height:550px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+        .Events(events => events.Error("error_handler"))
+        .Model(model => model.Id(p => p.UserID))
+        //.Model(model =>
+        //{
+        //    model.Id(p => p.UserID);
+        //    model.Field(p => p.UserName).Editable(false);
+        //    model.Field(p => p.Email).Editable(false);
+        //    model.Field(p => p.Password).Editable(false);
+        //    model.Field(p => p.Tel).Editable(false);
+        //    model.Field(p => p.Disabled).Editable(false);
+        //})
+        .Create(update => update.Action("EditingPopup_Create", "Home"))
+        .Read(read => read.Action("EditingPopup_Read", "Home"))
+        .Update(update => update.Action("EditingPopup_Update", "Home"))
+        .Destroy(update => update.Action("EditingPopup_Destroy", "Home"))
+    )
+)
+@*<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>*@
+@Scripts.Render("~/Content/js/index.js")
+@*<div id="grid"></div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Password)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Tel)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Disabled)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id = item.UserID},new { @class = "btn btn-primary" }) 
-            @Html.ActionLink("Details", "Details", new { id=item.UserID  }, new { @class = "btn btn-info" }) 
-            @Html.ActionLink("Delete", "Delete", new { id=item.UserID }, new { @class = "btn btn-danger" })
-        </td>
-    </tr>
-}
+    <script>
+        $(document).ready(function () {
+            $("[grid]").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "/Home/EditingPopup_Read", // Thay ControllerName và ActionName bằng tên thực tế của bạn
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                UserID: { type: "string" },
+                                UserName: { type: "string" },
+                                Password: { type: "string" },
+                                Email: { type: "string" },
+                                Tel: { type: "string" },
+                                Disabled: { type: "number" }
 
-</table>
+
+                                // Các thuộc tính khác tương ứng với model của bạn
+                            }
+                        }
+                    },
+                    pageSize: 10
+                },
+                columns: [
+                    { field: "UserID", title: "User ID" },
+                    { field: "UserName", title: "User Name" },
+                    { field: "Password", title: "Password" },
+                    { field: "Email", title: "Email" },
+                    { field: "Tel", title: "Tel" },
+                    { field: "Disabled", title: "Disabled" }
+                    // Các cột khác tương ứng với model của bạn
+                ],
+                pageable: true,
+                sortable: true
+            });
+        });
+    </script>*@
+
+
+@*<kendo-grid name="grid" height="430" >
+        <datasource type="DataSourceTagHelperType.Ajax" page-size="20"
+                    on-error="error_handler">
+            <schema data="Data" total="Total">
+                <model id="UserID">
+                    <fields>
+                        <field name="UserID" type="string" editable="false"></field>
+                        <field name="UserName" type="string"></field>
+                        <field name="Email" type="string"></field>
+                        <field name="Password" type="string"></field>
+                        <field name="Tel" type="string"></field>
+                        <field name="Disabled" type="string"></field>
+                    </fields>
+                </model>
+            </schema>
+            <transport>
+                <read url="@Url.Action("EditingPopup_Read", "Grid")" />
+                <update url="@Url.Action("EditingPopup_Update", "Grid")" />
+                <create url="@Url.Action("EditingPopup_Create", "Grid")" />
+                <destroy url="@Url.Action("EditingPopup_Destroy", "Grid")" />
+            </transport>
+        </datasource>
+        <columns>
+            <column field="UserName" />
+            <column field="Email" width="100" />
+            <column field="Password" width="100" />
+            <column field="Tel" width="100" />
+            <column field="Disabled" width="100" />
+            <column width="200">
+                <commands>
+                    <column-command text="Edit" name="edit"></column-command>
+                    <column-command text="Delete" name="destroy"></column-command>
+                </commands>
+            </column>
+        </columns>
+        <toolbar>
+            <toolbar-button name="create"></toolbar-button>
+        </toolbar>
+        <editable mode="popup" />
+        <pageable enabled="true" />
+        <sortable enabled="true" />
+        <scrollable enabled="true" />
+    </kendo-grid>
+
+    <script type="text/javascript">
+        function error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+    </script>*@

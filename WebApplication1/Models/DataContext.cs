@@ -5,38 +5,82 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Configuration;
+using System.Web.Mvc;
+using System.Web.Helpers;
+using Telerik.SvgIcons;
 
 namespace WebApplication1.Models
 {
     public class DataContext
     {
-        SqlConnection con = new SqlConnection("Data Source=VIP\\SQL2017;Initial Catalog=BasicWeb;Integrated Security=True");
+        string cs = ConfigurationManager.ConnectionStrings["basicdb"].ConnectionString;
+
         public List<Users> GetUsers()
         {
             List<Users> users = new List<Users>();
-            SqlCommand cmd = new SqlCommand("pcd_GetUsers", con);
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            DataTable dt = new DataTable();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(dt);
-            foreach (DataRow dr in dt.Rows)
+
+            using (SqlConnection connection = new SqlConnection(cs))
             {
-                Users us = new Users();
-                us.UserID = Convert.ToString(dr[0]);
-                us.UserName = Convert.ToString(dr[1]);
-                us.Password = Convert.ToString(dr[2]);
-                us.Email = Convert.ToString(dr[3]);
-                us.Tel = Convert.ToString(dr[4]);
-                us.Disabled = Convert.ToInt32(dr[5]);
-                users.Add(us);
+                connection.Open();
+                using (SqlCommand command = new SqlCommand("pcd_GetUsers", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Users user = new Users
+                            {
+                                UserID = reader.IsDBNull(0) ? null : reader.GetString(0),
+                                UserName = reader.IsDBNull(1) ? null : reader.GetString(1),
+                                Password = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                Email = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                Tel = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                Disabled = reader.GetByte(5)
+                            };
+                            users.Add(user);
+                        }
+                    }
+                }
             }
+
             return users;
         }
-        public int UpdateUser(Users users)
-        {
 
-            SqlCommand cmd = new SqlCommand("pcd_SaveUsers", con);
-                cmd = new SqlCommand("pcd_UpdateUser", con);
+
+        //us.UserID = Convert.ToString(dr.GetValue(0).ToString());
+        //us.UserName = Convert.ToString(dr.GetValue(1).ToString());
+        //us.Password = Convert.ToString(dr.GetValue(2).ToString());
+        //us.Email = Convert.ToString(dr.GetValue(3).ToString());
+        //us.Tel = Convert.ToString(dr.GetValue(4).ToString());
+        //us.Disabled = Convert.ToInt32(dr.GetValue(5).ToString());
+
+
+
+
+
+        //DataTable dt = new DataTable();
+        //SqlDataAdapter da = new SqlDataAdapter(cmd);
+        //da.Fill(dt);
+        //foreach (DataRow dr in dt.Rows)
+        //{
+        //    Users us = new Users();
+        //    us.UserID = Convert.ToString(dr[0]);
+        //    us.UserName = Convert.ToString(dr[1]);
+        //    us.Password = Convert.ToString(dr[2]);
+        //    us.Email = Convert.ToString(dr[3]);
+        //    us.Tel = Convert.ToString(dr[4]);
+        //    us.Disabled = Convert.ToInt32(dr[5]);
+        //    users.Add(us);
+        //}
+        //return users;
+    
+    public int UpdateUser(Users users)
+        {
+            SqlConnection con = new SqlConnection(cs);
+            SqlCommand cmd = new SqlCommand("pcd_UpdateUser", con);
+                //cmd = new SqlCommand("pcd_UpdateUser", con);
                 cmd.Parameters.AddWithValue("@userid", users.UserID);
             cmd.CommandType = CommandType.StoredProcedure;
             con.Open();
@@ -54,9 +98,9 @@ namespace WebApplication1.Models
 
         public int SaveUser(Users users)
         {
-            
+            SqlConnection con = new SqlConnection(cs);
             SqlCommand cmd = new SqlCommand("pcd_SaveUsers", con);
-            cmd = new SqlCommand("pcd_UpdateUser", con);
+            //cmd = new SqlCommand("pcd_UpdateUser", con);
             cmd.CommandType = CommandType.StoredProcedure;
             con.Open();
             cmd.Parameters.AddWithValue("@userid", users.UserID.Trim());
@@ -70,9 +114,9 @@ namespace WebApplication1.Models
             return i;
 
         }
-        public Users GetUsersByID(string id)
+        public  Users GetUsersByID(string id)
         {
-
+            SqlConnection con = new SqlConnection(cs);
 
             Users users = new Users();
 
@@ -90,7 +134,7 @@ namespace WebApplication1.Models
                 users.Password = Convert.ToString(dr[2]);
                 users.Email = Convert.ToString(dr[3]);
                 users.Tel = Convert.ToString(dr[4]);
-                users.Disabled = Convert.ToInt32(dr[5]);
+                users.Disabled = Convert.ToByte(dr[5]);
 
             }
             return users;
@@ -101,11 +145,11 @@ namespace WebApplication1.Models
 
         public int DeleteUser(string id)
         {
-
-            SqlCommand cmd = new SqlCommand("pcd_SaveUsers", con);
+            SqlConnection con = new SqlConnection(cs);
+            SqlCommand cmd = new SqlCommand("pcd_DeleteUsers", con);
 
             
-            cmd = new SqlCommand("pcd_DeleteUsers", con);
+            //cmd = new SqlCommand("pcd_DeleteUsers", con);
             cmd.Parameters.AddWithValue("@userID", id);           
             cmd.CommandType = CommandType.StoredProcedure;
             con.Open();
@@ -116,6 +160,7 @@ namespace WebApplication1.Models
         }
         public List<Users> GetUsersByEmail(string search)
         {
+            SqlConnection con = new SqlConnection(cs);
             List<Users> users = new List<Users>();
 
             SqlCommand cmd = new SqlCommand("GetUsersByEmail", con);
@@ -134,7 +179,7 @@ namespace WebApplication1.Models
                         user.Password = reader["Password"] == DBNull.Value ? null : (string)reader["Password"];
                         user.Email = (string)reader["Email"];
                         user.Tel = reader["Tel"] == DBNull.Value ? null : (string)reader["Tel"];
-                        user.Disabled = (int)reader["Disabled"];
+                        user.Disabled = (byte)reader["Disabled"];
 
                         users.Add(user);
                     }
